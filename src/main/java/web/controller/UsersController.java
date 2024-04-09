@@ -1,18 +1,22 @@
 package web.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import web.model.User;
 import web.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
 public class UsersController {
-    @Autowired
-    UserService userService;
+    private final UserService userService;
+
+    public UsersController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/")
     public String getAllUsers(Model model) {
@@ -30,13 +34,16 @@ public class UsersController {
     }
 
     @GetMapping("/create")
-    public String newUser(Model model) {
-        model.addAttribute("newUser", new User());
+    public String newUser(@ModelAttribute("user") User user) {
+//        model.addAttribute("newUser", new User());
         return "createUser";
     }
 
     @PostMapping
-    public String create(@ModelAttribute("user") User user) {
+    public String create(@ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()){
+            return "createUser";
+        }
         userService.addUser(user);
         return "redirect:/";
     }
@@ -47,7 +54,11 @@ public class UsersController {
         return "/edit";
     }
     @PatchMapping("/update")
-    public String update(@ModelAttribute User user, @RequestParam("id") Long id) {
+    public String update(@ModelAttribute("updatableUser") @Valid User user,
+                         BindingResult bindingResult, @RequestParam("id") Long id) {
+        if(bindingResult.hasErrors()) {
+            return "/edit";
+        }
         userService.updateUserById(id, user);
         return "redirect:/";
     }

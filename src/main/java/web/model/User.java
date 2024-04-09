@@ -1,7 +1,16 @@
 package web.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
-import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -10,10 +19,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "name")
+    @NotEmpty(message = "Name can't be empty")
+    @Size(min = 2, max = 24, message = "Min size name 2, max size name 24")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Does not correspond to the format")
     private String name;
     @Column(name = "surname")
+    @NotEmpty(message = "Surname can't be empty")
+    @Size(min = 2, max = 24, message = "Min size surname 2, max size surname 24")
+    @Pattern(regexp = "^[a-zA-Zа-яА-Я]+$", message = "Does not correspond to the format")
     private String surname;
     @Column(name = "age")
+    @Min(value = 0)
     private int age;
 
     public User() {
